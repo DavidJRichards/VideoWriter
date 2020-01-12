@@ -19,7 +19,7 @@ comments in code refer to line numbers in VW2MSX.BAS program
 #define BOOT_RESERVE    0x0
 #define LENGTH_TRACK    (LENGTH_SECTOR * SECTORS_TRACK)
 
-#define DISK_IMG_FILE "../../disks/VW1.img"
+#define DISK_IMG_FILE "../../disks/VW2.img"
 
 int T[32];
 int S[32];
@@ -37,6 +37,24 @@ const unsigned char w[] = {
 const unsigned char v[] = {
 /*0x22,*/0x5E,0x60,0x27,0x2A,0x2A,0x2A,0x84,0x2A,0x83,0x85,0xA0,0x2A,0x2A,0x2A,0x89,0x88,0x8A,0x82,0x8B,0x8C,0x8D,0xA1,0x2A,0x94,0x2A,0x93,0x95,0xA2,0x2A,0x81,0x96,0x97,0xA3/*,0x22*/
 };
+
+void trackdump(unsigned char * data)
+{
+    int h,i,j,k;
+    for(j=0; j<144; j++)
+    {
+        k=j*32;
+        printf("\n %04X ",k);
+        for(i=0; i<32; i++)
+        {
+            h=k+i;
+            printf("%02X ", data[h]);
+        }
+    }
+    printf("\n");
+}
+
+
 int read_track(int number_track, char * buffer_track)
 {
 
@@ -55,10 +73,9 @@ int read_track(int number_track, char * buffer_track)
 
 //    printf("\nbuffering track #%d",number_track);
 
-    memset(buffer_track,0,sizeof(buffer_track));
+    memset(buffer_track, 0x24, LENGTH_TRACK);
 
-
-    fd = fopen(DISK_IMG_FILE,"r");
+    fd = fopen(DISK_IMG_FILE,"rb");
 
     if(NULL == fd)
     {
@@ -68,7 +85,6 @@ int read_track(int number_track, char * buffer_track)
 
 //    printf("\nseek to position 0x%X",file_offset);
 
-
     if(0 != fseek(fd, file_offset, SEEK_CUR))
     {
         printf("\n fseek() failed\n");
@@ -77,15 +93,12 @@ int read_track(int number_track, char * buffer_track)
 
     result=fread(buffer_track,SIZE,LENGTH_TRACK,fd);
 
-        // bug here somewhere, sometimes not all bytes read
-
-//    if(LENGTH_TRACK != result);
+    if(LENGTH_TRACK != result)
     {
-//        printf("\n fread() failed %d\n",result);
+        printf("\n fread() failed %d != %d\n",LENGTH_TRACK, result);
+        trackdump(buffer_track);
         return 1;
     }
-    printf("\n fread() ok %d\n",result);
-
     fclose(fd);
     //printf("\n File stream closed through fclose()\n");
 
@@ -133,7 +146,7 @@ int main(void)
 //    printf("\nd:0x%X",d);
 
 // line 280
-    for(i=0; i<=q; i++)
+    for(i=0; i<q; i++)
     {
         FT[i] = buff[d + 20 + 2 * i];
         FS[i] = buff[d + 21 + 2 * i];
@@ -159,7 +172,7 @@ int main(void)
                 read_track(t, buff);
             }
 
- //           printf("\n(line310) n=%d, s=%d, m=%d)\n",n, s, m);
+//           printf("\n(line310) n=%d, s=%d, m=%d)\n",n, s, m);
 
 // line 320
             d=s*256 + m*64;
