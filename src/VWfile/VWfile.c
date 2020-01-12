@@ -19,7 +19,7 @@ comments in code refer to line numbers in VW2MSX.BAS program
 #define BOOT_RESERVE    0x0
 #define LENGTH_TRACK    (LENGTH_SECTOR * SECTORS_TRACK)
 
-#define DISK_IMG_FILE "../../disks/VW2.img"
+#define DISK_IMG_FILE "../../disks/VW1.img"
 
 int T[32];
 int S[32];
