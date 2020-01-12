@@ -1,0 +1,73 @@
+10 'Program transfers VIDEOWRITER files to an MS (X) DOS disk
+20 'Peter van Overbeek, 1992
+30 A = &HFB21: A$="VIDEOWRITER-": B$=CHR$(34)
+40 IF PEEK(A) < 2 THEN PRINT "This program requires two disk drives!": END
+50 SCREEN0: WIDTH80: KEYOFF: DEF INT A-Z: A = &HD000: B = &H9000: R = &HD062
+60 V$="^`'***„*ƒ… ***‰ˆŠ‚‹Œ¡*”*“•¢*–—£"
+70 PRINT TAB (30); "VW2MSX.BAS": GOSUB560
+80 PRINT "This program transfers NMS 3030" A$ "files to a PC or MSX disk."
+90 PRINT: PRINT "Put the" A$ "disk in drive A and a PC or MSX disk in drive B."
+100 LOCATE,6,0:IF PEEK(R) <>80 THEN GOSUB620
+110 PRINT TAB(21) "¯¯¯¯ Press a ®®®® key";: I$ = INPUT$(1)
+120 T = 0: GOSUB 580: CLS: N = PEEK (B + &HBC): IF N > 53 THEN X = 1: GOTO 610
+130 PRINT "This" A$ "disk contains the following" N "file (s) and number of pages."
+140 GOSUB 560: PRINT "1.¯¯¯¯ STOPPING ®®®®": FOR F = 1 TO N: LOCATE 27 * (F \ 18), F MOD 18 + 2
+150 D = B + 198 + F * 64: IF PEEK (D-6) <> 1 THEN GOTO 170
+160 PRINT USING "##."; F + 1;: GOSUB 570: PRINT USING "##"; PEEK (D-5);: NEXT
+170 LOCATE 0,20: GOSUB 560
+180 LOCATE 4,21: PRINT "Select the number of the file to be transferred";
+190 INPUT N$: N = VAL (N$): IF N = 1 THEN GOTO 450
+200 IF N > F OR N < 1 THEN GOTO 180
+210 INPUT "Name for the file on disk B (max. 8 characters)"; E$
+220 IF LEN(E$) > 8 THEN E$ = LEFT$(E$,8)
+230 E$ = "B:" + E$ + ".VWX": OPEN E$ FOR OUTPUT AS #1
+240 CLS: PRINT A$ "file" B$;
+250 D = B + 134 + N * 64: GOSUB 570: PRINT B$;: P = PEEK(D-5): Q = (P-1) \ 4
+260 PRINT "consists of" P "page (s).": GOSUB 560
+270 DIM T(31), S(31), FT(Q), FS(Q)
+280 FOR I = 0 TO Q: FT(I) = PEEK (D + 20 + 2 * I): FS(I) = PEEK (D + 21 + 2 * I): NEXT
+290 FOR N = 0 TO Q: FOR M = 0 TO 3: IF 4 * N + M + 1> P THEN GOTO 410
+300 PRINT: PRINT "¯¯¯¯¯¯ Page" 4 * N + M + 1 "®®®®®®®"
+310 S = FS(N): IF T <> FT(N) THEN T = FT(N): GOSUB 580
+320 D = B + S * 256 + M * 64: G = PEEK(D): H = PEEK(D + 1)
+330 FOR I = 0 TO H: T(I) = PEEK (D + 2 * I + 2): S(I) = PEEK (D + 2 * I + 3): NEXT
+340 FOR I = 0 TO H: IF T(I) <> T THEN T = T(I): GOSUB 580
+350 D = B + 256 * S (I): K = 255: IF I = H THEN K = G
+360 FOR J = 0 TO K: C = PEEK (D + J)
+370 IF C < 32 THEN GOSUB 470 ELSE IF C > 127 THEN Y = 1: GOSUB 510
+380 IF C = 92 THEN C = 156
+390 IF Y THEN PRINT CHR$(C);: PRINT #1, CHR$(C);
+400 NEXT J: NEXT I: NEXT M
+410 NEXT N: PRINT: GOSUB 560
+420 CLOSE # 1
+430 PRINT A$ "file" B$ C$ B$ "transferred to" B$ E$ B$ "."
+440 ERASE T, S, FT, FS: GOTO 110
+450 CLS: PRINT "VW2MSX.BAS is a program by Peter van Overbeek."
+460 KEYON: END
+470 IF C = O THEN Y = 0: RETURN
+480 IF C > 25 THEN C = ASC (MID$ ("E O U", C-25.1)): RETURN
+490 IF C = 21 THEN C = 142 ELSE C = 42
+500 RETURN
+510 IF C = 150 THEN C = 10: RETURN
+520 IF C = 255 THEN C = 13: RETURN
+530 IF C > 145 AND C < 179 THEN C = ASC(MID$ (V$, C-145, 1)): RETURN
+540 IF C = 144 THEN C = 34: RETURN
+550 C = 42: RETURN
+560 FOR I = 0 TO 79: PRINT "-" ;: NEXT: RETURN
+570 C$ = "": FOR J = D TO D + 19: C$ = C$ + CHR$ (PEEK (Y)): NEXT: PRINT C$;: RETURN
+580 DEF USR = A: X = USR(T): IF X = 0 THEN RETURN ELSE LOCATE 20,12
+590 IF X AND 128 THEN PRINT "No" A$ "disk present in drive A": GOTO 100
+600 IF X AND 16 THEN PRINT "Disk in drive A is not an" A$ "disk!": GOTO 100
+610 IF X AND 15 THEN PRINT A$ "disk contains incorrect data!": GOTO 100
+620 C = 17269: FOR I = 0 TO 143: READ D$: D = VAL ("&H" + D$): POKE A + I, D: C = C-D: NEXT
+630 IF C THEN PRINT "Error in DATA!": POKE R,0: KEYON: END
+640 RETURN
+650 DATA 3A,22,FB,26,40,CD,24,00,AF,32,FC,7F,3E,C0,32,FD
+660 DATA 7F,21,F8,7F,55,1B,7A,B3,E3,E3,20,F9,CB,7E,28,06
+670 DATA 7E,32,F8,F7,18,2A,CD,77,D0,3A,F8,F7,32,FB,7F,36
+680 DATA 14,CD,79,D0,06,12,11,00,90,3E,12,90,32,FA,7F,36
+690 DATA 82,CD,82,D0,7E,B7,20,02,10,EF,32,F8,F7,CD,77,D0
+700 DATA AF,32,FD,7F,3A,C1,FC,26,40,CD,24,00,FB,C9,28,63
+710 DATA 29,20,50,65,74,65,72,20,76,61,6E,20,4F,76,65,72
+720 DATA 62,65,65,6B,27,39,32,36,04,3A,FF,7F,CB,77,20,F9
+730 DATA 7E,C9,3A,FF,7F,87,F0,38,F9,3A,FB,7F,12,13,18,F2

@@ -1,0 +1,18 @@
+10 'Testprogramma voor overgezette VIDEOWRITER bestanden"
+20 '(c) Peter van Overbeek, 1992
+30 CLS:A$=" VIDEOWRITER":KEYOFF
+40 PRINT"Met dit programma kan de inhoud van overgezette"A$"-bestanden"
+50 PRINT"bekeken worden. Tijdens het tonen van de inhoud kan met CTRL/S"
+60 PRINT"de voorbijkomende tekst even stilgezet worden."
+70 PRINT:PRINT"Zet de disk met overgezette"A$"-bestand(en) in drive A."
+80 PRINT:PRINT"Druk dan een toets...":I$=INPUT$(1)
+90 CLS:PRINT"De volgende"A$"-bestanden zijn aanwezig:"
+100 GOSUB 180:FILES"*.VWX":PRINT:GOSUB 180
+110 PRINT"Geef de naam van het te controleren bestand (zonder de extensie .VWX):"
+120 INPUT D$:D$=D$+".VWX":CLS:PRINT"Inhoud van "CHR$(34)D$CHR$(34):GOSUB 180
+130 COPY D$ TO "con"
+140 PRINT:GOSUB 180:PRINT"Nog een bestand controleren (j/n)?";
+150 I$=INPUT$(1):IF I$="j" OR I$="J" THEN GOTO 90
+160 CLS:PRINT"VWTEST.BAS is een programma van Peter van Overbeek."
+170 KEYON:END
+180 FOR I=0 TO 79:PRINT"-";:NEXT:RETURN
