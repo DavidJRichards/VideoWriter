@@ -1,7 +1,9 @@
-﻿﻿﻿﻿﻿
+﻿﻿﻿﻿
 # ﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿Video Writer
 
 Collection of information about Philips VideoWriter 4460
+
+[Scan of VideoWriter 4260 4460 manual](docs/VideoWriter-4260-4460.pdf)
 
 ![Philips VW 4460](photos/IMG_20191227_233248.jpg)
 
